@@ -4,6 +4,8 @@ import SearchElement from "../components/SearchElement";
 import moduleData from "../moduleData";
 
 export default function Search() {
+  const [query, setQuery] = useState('');
+  
   return (
     <>
       {/* Header */}
