@@ -5,7 +5,7 @@ import moduleData from "../moduleData";
 
 export default function Search() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [data, setData] = useState();
+  const [data, setData] = useState("");
   const [initialIdx, setInitialIdx] = useState(0);
   const [finalIdx, setFinalIdx] = useState(3);
 
