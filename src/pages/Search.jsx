@@ -1,9 +1,37 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import SearchElement from "../components/SearchElement";
+import SearchResult from "../components/SearchResult";
 import moduleData from "../moduleData";
 
 export default function Search() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [data, setData] = useState();
+  const [initialIdx, setInitialIdx] = useState(0);
+  const [finalIdx, setFinalIdx] = useState(3);
+
+  useEffect(() => {
+    updateData();
+  }, [searchQuery]);
+
+  const updateData = () => {
+    const tempArr = [];
+    for (let i = 0; i < moduleData.length; i++) {
+      for (let j = 0; j < moduleData[i].data.length; j++) {
+        if (
+          moduleData[i].data[j].heading
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())
+        ) {
+          tempArr.push(moduleData[i].data[j]);
+        }
+      }
+    }
+    setData(tempArr);
+    setInitialIdx(0);
+    setFinalIdx(3);
+    console.log(data);
+  };
+
   return (
     <>
       {/* Header */}
@@ -28,27 +56,28 @@ export default function Search() {
           <span className="text-md text-gray-300">Type here to search</span>
           <input
             type="text"
-            name="name"
+            name="searchQuery"
             placeholder="Ut hendrerit"
+            value={searchQuery}
             className="border-b-2 text-2xl pb-4 my-4 text-white bg-transparent outline-none"
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              updateData();
+            }}
           />
-          <span className="text-gray-400 text-xl">Showing 5 results...</span>
+          <span className="text-gray-400 text-xl">
+            Showing {data && data.length} results...
+          </span>
         </div>
 
         {/* Search results */}
-        <div className="flex flex-col gap-10 bg-white py-10 mt-6">
-          {moduleData.map((val, idx) => (
-            <div>
-              {/* Display search results */}
-              <SearchElement
-                imageUrl={val.data[0].image}
-                heading={val.data[0].heading}
-                content={val.data[0].content}
-                key={idx}
-              />
-            </div>
-          ))}
 
+        <div className="flex flex-col gap-10 bg-white py-10 mt-6">
+          <SearchResult
+            data={data}
+            initialIdx={initialIdx}
+            finalIdx={finalIdx}
+          />
           {/* Icons */}
           <div className="flex justify-end pr-10">
             <div className="flex">
@@ -57,12 +86,16 @@ export default function Search() {
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 className="w-10 h-10 cursor-pointer"
+                onClick={() => {
+                  setInitialIdx((prevVal) => (prevVal < 3 ? 0 : prevVal - 3));
+                  setFinalIdx((prevVal) => (prevVal <= 3 ? 3 : prevVal - 3));
+                }}
               >
                 <path
                   fillRule="evenodd"
                   d="M7.72 12.53a.75.75 0 010-1.06l7.5-7.5a.75.75 0 111.06 1.06L9.31 12l6.97 6.97a.75.75 0 11-1.06 1.06l-7.5-7.5z"
                   clipRule="evenodd"
-                  stroke="#949494"
+                  stroke={initialIdx > 0 ? "#124A84" : "#949494"}
                   stroke-width="2"
                 />
               </svg>
@@ -72,12 +105,20 @@ export default function Search() {
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 class="w-10 h-10 cursor-pointer"
+                onClick={() => {
+                  setInitialIdx((prevVal) =>
+                    prevVal >= data.length - 3 ? prevVal : prevVal + 3
+                  );
+                  setFinalIdx((prevVal) =>
+                    prevVal >= data.length - 1 ? data.length : prevVal + 3
+                  );
+                }}
               >
                 <path
                   fill-rule="evenodd"
                   d="M16.28 11.47a.75.75 0 010 1.06l-7.5 7.5a.75.75 0 01-1.06-1.06L14.69 12 7.72 5.03a.75.75 0 011.06-1.06l7.5 7.5z"
                   clip-rule="evenodd"
-                  stroke="#124A84"
+                  stroke={finalIdx === data.length ? "#949494" : "#124A84"}
                   stroke-width="2"
                 />
               </svg>
